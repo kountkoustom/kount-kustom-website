@@ -1,0 +1,25 @@
+KOUNT KUSTOM WEBSITE — GITHUB UPLOAD
+
+Upload the CONTENTS of this folder to the root of your GitHub repository.
+
+You should see:
+index.html
+preventive-security.html
+solutions.html
+edge-box.html
+security-audit.html
+industries.html
+system-integrators.html
+case-studies.html
+knowledge-centre.html
+about.html
+contact.html
+styles.css
+script.js
+assets/
+
+Do NOT upload the ZIP itself as the website.
+
+For Cloudflare Pages, the repository root should contain index.html.
+
+The forms are currently prototype forms. Supabase/Admin connection will be done after the public frontend is deployed and checked.
