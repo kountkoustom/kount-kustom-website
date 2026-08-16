@@ -1,0 +1,3 @@
+LOGO UPDATE
+The original Kount Kustom 3D transparent PNG logo supplied by the owner is now used
+throughout the website header/footer and as the favicon source.
