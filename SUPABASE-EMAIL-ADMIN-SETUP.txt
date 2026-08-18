@@ -1,0 +1,39 @@
+# Kount Kustom V2.4 — Supabase Audit + Admin
+
+## Included
+- `/admin/index.html` — real Supabase-authenticated admin panel.
+- `security-audit.html` — saves audit enquiries to `public.leads`.
+- `supabase/functions/send-audit-email/index.ts` — Resend email notification function.
+- `supabase/functions/send-audit-email/config.toml` — allows the public website to invoke the email function.
+- Your existing 11-page website and logo.
+
+## Supabase
+The website uses the Supabase Publishable API key in browser code. Never put a Secret/Service Role key in the website.
+
+Your admin user must already be present in `public.admin_users` (you have already added `sunneetjain@gmail.com`).
+
+## Resend / email setup
+In Supabase > Edge Functions > Secrets, add:
+- `RESEND_API_KEY` = your Resend API key
+- `NOTIFY_EMAIL` = `kustomkounts@gmail.com`
+- `FROM_EMAIL` = a sender address on a domain verified in Resend, e.g. `Kount Kustom <alerts@kountkustom.com>`
+
+Then deploy the function `send-audit-email` from:
+`supabase/functions/send-audit-email/index.ts`
+
+Do not put the Resend API key into GitHub.
+
+## GitHub
+Upload the entire extracted package, including the `admin` folder and `supabase` folder. Commit directly to `main`.
+
+## Cloudflare
+Your existing Cloudflare Worker should deploy from the repository root. After GitHub deployment completes, verify:
+- https://kountkustom.com/
+- https://kountkustom.com/admin/
+- https://kountkustom.com/security-audit.html
+
+## Test
+1. Open `/admin/` and sign in as `sunneetjain@gmail.com`.
+2. Submit one test audit.
+3. Confirm the lead appears in Admin > Security Audits.
+4. Confirm the email arrives at `kustomkounts@gmail.com`.

@@ -57,13 +57,16 @@
 <div class="compare-foot">The goal is to verify security, not merely equipment.</div>
 </div></div></section>
 
-<section id="audit-form" class="section section-soft"><div class="container"><div class="section-heading centered"><div class="eyebrow">BOOK YOUR AUDIT</div><h2>Start with a <span>conversation.</span></h2><p>This form is the first version. In the next development stage, it will connect directly to the Kount Kustom lead database and admin panel.</p></div>
-<form class="audit-form" onsubmit="event.preventDefault(); alert('Thank you. Your audit enquiry has been captured in this prototype.');">
-<div><label>Name</label><input required placeholder="Your name"></div><div><label>Company</label><input required placeholder="Company / organisation"></div>
-<div><label>Mobile</label><input required placeholder="+91"></div><div><label>Email</label><input type="email" placeholder="name@company.com"></div>
-<div><label>City</label><input placeholder="City"></div><div><label>Site Type</label><select><option>Industrial</option><option>Commercial</option><option>Residential</option><option>Warehouse</option><option>School / Campus</option><option>Society</option><option>Other</option></select></div>
-<div class="full"><label>What do you want to assess?</label><textarea rows="4" placeholder="CCTV / fire alarm / access control / emergency response / complete security architecture"></textarea></div>
-<div class="full"><button class="btn btn-gold" type="submit">Request Preventive Security Audit →</button></div>
+<section id="audit-form" class="section section-soft"><div class="container"><div class="section-heading centered"><div class="eyebrow">BOOK YOUR AUDIT</div><h2>Start with a <span>conversation.</span></h2><p>Tell us a little about your site. Your enquiry is securely submitted to Kount Kustom for follow-up.</p></div>
+<form class="audit-form" id="auditForm">
+<div><label for="audit-name">Name *</label><input id="audit-name" name="name" required placeholder="Your name" autocomplete="name"></div>
+<div><label for="audit-company">Company *</label><input id="audit-company" name="company" required placeholder="Company / organisation" autocomplete="organization"></div>
+<div><label for="audit-mobile">Mobile *</label><input id="audit-mobile" name="mobile" required placeholder="+91" autocomplete="tel"></div>
+<div><label for="audit-email">Email</label><input id="audit-email" name="email" type="email" placeholder="name@company.com" autocomplete="email"></div>
+<div><label for="audit-city">City</label><input id="audit-city" name="city" placeholder="City"></div>
+<div><label for="audit-site">Site Type</label><select id="audit-site" name="site_type"><option>Industrial</option><option>Commercial</option><option>Residential</option><option>Warehouse</option><option>School / Campus</option><option>Society</option><option>Hotel</option><option>Hospital</option><option>Other</option></select></div>
+<div class="full"><label for="audit-requirement">What do you want to assess?</label><textarea id="audit-requirement" name="requirement" rows="4" placeholder="CCTV / fire alarm / access control / emergency response / complete security architecture"></textarea></div>
+<div class="full"><button class="btn btn-gold" id="auditSubmit" type="submit">Request Preventive Security Audit →</button><div id="auditMessage" class="form-message" role="status" aria-live="polite"></div></div>
 </form></div></section>
 
 <section class="audit"><div class="container audit-grid"><div><div class="eyebrow">THE KOUNT KUSTOM APPROACH</div><h2>Security is not installed. <span>Security is verified.</span></h2><p>Our audit starts with the risk and works backward to the detection, response and verification required.</p></div>
@@ -71,4 +74,20 @@
 </main>
 <footer class="footer"><div class="container footer-grid"><div class="footer-brand"><span class="kk-logo-embedded" role="img" aria-label="Kount Kustom logo"></span><h3>KOUNT KUSTOM</h3><p>Preventive Security | Security Architecture | ELV Consultancy</p></div><div><h4>Explore</h4><a href="index.html">Home</a><a href="preventive-security.html">Preventive Security</a><a href="solutions.html">Solutions</a><a href="edge-box.html">EDGE Box</a></div><div><h4>Business</h4><a href="security-audit.html">Security Audit</a><a href="system-integrators.html">System Integrators</a><a href="industries.html">Industries</a></div><div><h4>Contact</h4><p>Preventive Security consultation</p><a href="#audit-form">Book an Audit →</a></div></div><div class="container copyright">© Kount Kustom. Preventive Security is the focus.</div></footer>
 <script src="script.js"></script>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase=createClient("https://syxkowqwqnvyhazgugte.supabase.co","sb_publishable_7ydS4A0HMSjW0RiR3dL3xg_v13-Nn9F");
+const form=document.getElementById("auditForm"), button=document.getElementById("auditSubmit"), message=document.getElementById("auditMessage");
+form?.addEventListener("submit",async e=>{
+ e.preventDefault(); button.disabled=true; button.textContent="Submitting…"; message.textContent="";
+ const d=Object.fromEntries(new FormData(form).entries());
+ const lead={lead_type:"audit",name:d.name.trim(),company:d.company.trim(),mobile:d.mobile.trim(),email:d.email.trim()||null,city:d.city.trim()||null,site_type:d.site_type||null,requirement:d.requirement.trim()||null,source:"website"};
+ const {data:saved,error}=await supabase.from("leads").insert(lead).select("id,lead_type,name,company,mobile,email,city,site_type,requirement,status,created_at").single();
+ if(error){console.error(error);message.textContent="We could not submit the enquiry right now. Please call +91 9509015669.";button.disabled=false;button.textContent="Request Preventive Security Audit →";return;}
+ let emailSent=false;
+ try{const r=await supabase.functions.invoke("send-audit-email",{body:{lead:saved}});emailSent=!r.error;if(r.error)console.warn("Email notification:",r.error)}catch(err){console.warn("Email notification unavailable:",err)}
+ form.reset();message.textContent=emailSent?"Thank you. Your Preventive Security Audit enquiry has been received. Our team will contact you shortly.":"Thank you. Your enquiry has been received. Our team will contact you shortly.";message.classList.add("success");
+ button.disabled=false;button.textContent="Request Preventive Security Audit →";
+});
+</script>
 </body></html>
